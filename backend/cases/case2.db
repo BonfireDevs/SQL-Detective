@@ -1,0 +1,60 @@
+-- Case metadata
+CREATE TABLE case_metadata (
+    title TEXT,
+    description TEXT,
+    starting_clue TEXT,
+    difficulty TEXT,
+    required_concept TEXT
+);
+
+INSERT INTO case_metadata VALUES (
+    'The Bank Heist',
+    'A bank vault was robbed last night. Find connections between employees and suspicious transactions.',
+    'The vault was accessed at 2:37 AM. Check which employees have access to the vault.',
+    'intermediate',
+    'JOIN operations'
+);
+
+-- Employees table
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    position TEXT,
+    access_level INTEGER,
+    hire_date TEXT
+);
+
+INSERT INTO employees VALUES
+    (1, 'Robert Johnson', 'Teller', 1, '2020-03-15'),
+    (2, 'Lisa Thompson', 'Manager', 3, '2018-06-22'),
+    (3, 'David Miller', 'Security', 2, '2021-01-10'),
+    (4, 'Jennifer Lee', 'Teller', 1, '2022-05-30');
+
+-- Transactions table
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY,
+    timestamp TEXT,
+    amount REAL,
+    account_id INTEGER,
+    employee_id INTEGER,
+    transaction_type TEXT
+);
+
+INSERT INTO transactions VALUES
+    (1, '2023-06-10 09:15:22', 150.00, 1001, 1, 'deposit'),
+    (2, '2023-06-10 14:30:45', 2500.00, 1005, 2, 'withdrawal'),
+    (3, '2023-06-10 02:37:12', 100000.00, NULL, NULL, 'vault_access'),
+    (4, '2023-06-09 16:22:33', 500.00, 1002, 4, 'deposit');
+
+-- Clues table for clue progression
+CREATE TABLE clues (
+    clue_index INTEGER PRIMARY KEY,
+    text TEXT,
+    expected_query TEXT,
+    expected_result TEXT
+);
+
+INSERT INTO clues (clue_index, text, expected_query, expected_result) VALUES
+    (0, 'Which employees have access level 3 (vault access)?', 'SELECT * FROM employees WHERE access_level = 3', NULL),
+    (1, 'Find all transactions that happened at 2:37 AM.', 'SELECT * FROM transactions WHERE timestamp LIKE "%02:37%"', NULL),
+    (2, 'Who is the manager that could have accessed the vault?', 'SELECT * FROM employees WHERE position = "Manager" AND access_level = 3', NULL);

@@ -1,0 +1,46 @@
+-- Case metadata
+CREATE TABLE case_metadata (
+    title TEXT,
+    description TEXT,
+    starting_clue TEXT,
+    difficulty TEXT,
+    required_concept TEXT
+);
+
+INSERT INTO case_metadata VALUES (
+    'The Missing Artifact',
+    'A valuable artifact has gone missing from the museum. Use SQL to find clues in the employee records and security logs.',
+    'The artifact was last seen in the Egyptian exhibit on the night of the theft. Check the security logs for that night.',
+    'beginner',
+    'SELECT with WHERE clause'
+);
+
+-- Suspects table
+CREATE TABLE suspects (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    position TEXT,
+    alibi TEXT,
+    access_level INTEGER
+);
+
+INSERT INTO suspects VALUES 
+    (1, 'John Smith', 'Security Guard', 'Was patrolling the west wing', 2),
+    (2, 'Emily Davis', 'Curator', 'Was at home sick', 3),
+    (3, 'Michael Johnson', 'Janitor', 'Cleaning the basement', 1),
+    (4, 'Sarah Wilson', 'Tour Guide', 'Leading a private tour', 2);
+
+-- Security logs table
+CREATE TABLE security_logs (
+    id INTEGER PRIMARY KEY,
+    timestamp TEXT,
+    location TEXT,
+    event_type TEXT,
+    employee_id INTEGER
+);
+
+INSERT INTO security_logs VALUES
+    (1, '2023-05-15 20:15:00', 'Egyptian Exhibit', 'Door opened', 1),
+    (2, '2023-05-15 20:30:00', 'Egyptian Exhibit', 'Motion detected', NULL),
+    (3, '2023-05-15 21:00:00', 'Main Hall', 'Door opened', 4),
+    (4, '2023-05-15 21:15:00', 'Storage Room', 'Door opened', 2);
