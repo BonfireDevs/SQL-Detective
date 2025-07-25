@@ -5,6 +5,7 @@ import ResultsTable from '../components/ResultsTable';
 import ClueLog from '../components/ClueLog';
 import StatusPanel from '../components/StatusPanel';
 import LeaderboardPanel from '../components/LeaderboardPanel';
+import SQLReferencePanel from '../components/SQLReferencePanel';
 
 const CasePage = () => {
   const { caseId } = useParams();
@@ -20,6 +21,9 @@ const CasePage = () => {
   const [solved, setSolved] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [startTime, setStartTime] = useState(Date.now());
+  const [hint, setHint] = useState(null);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [showSQLRef, setShowSQLRef] = useState(false);
 
   // Load case info and clues
   useEffect(() => {
@@ -128,6 +132,23 @@ const CasePage = () => {
     }
   };
 
+  const getHint = async () => {
+    const response = await fetch(`http://localhost:8000/case/${caseId}/clue/${currentClueIndex}/hint`);
+    const data = await response.json();
+    setHint(data.hint);
+    if (!hintUsed) {
+      setHintUsed(true);
+      // Penalize leaderboard time by 30 seconds
+      setStartTime((prev) => prev - 30000);
+      // Award/track badge for using a hint
+      let badges = JSON.parse(localStorage.getItem('badges') || '{"join":false,"crime":false,"select":false,"hint":false}');
+      if (!badges.hint) {
+        badges.hint = true;
+        localStorage.setItem('badges', JSON.stringify(badges));
+      }
+    }
+  };
+
   useEffect(() => {
     if (solved) {
       let user = localStorage.getItem('username');
@@ -140,6 +161,12 @@ const CasePage = () => {
       leaderboard.push({ user, time });
       leaderboard.sort((a, b) => a.time - b.time);
       localStorage.setItem('leaderboard', JSON.stringify(leaderboard.slice(0, 10)));
+      // Award new badges
+      let badges = JSON.parse(localStorage.getItem('badges') || '{"join":false,"crime":false,"select":false,"hint":false,"speed":false,"perfect":false,"first":false}');
+      if (time <= 60 && !badges.speed) { badges.speed = true; }
+      if (!hintUsed && !badges.perfect) { badges.perfect = true; }
+      if (leaderboard.length > 0 && leaderboard[0].user === user && !badges.first) { badges.first = true; }
+      localStorage.setItem('badges', JSON.stringify(badges));
     }
   }, [solved, startTime]);
 
@@ -159,7 +186,13 @@ const CasePage = () => {
       <div className="mb-6 p-4 bg-blue-50 rounded-md border-l-4 border-blue-400">
         <h2 className="font-semibold text-blue-800 mb-2">Current Clue</h2>
         <p className="text-blue-900">{clues[currentClueIndex]?.text}</p>
+        <button onClick={getHint} className="mt-2 px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500">Get Hint</button>
+        {hint && <div className="mt-2 p-2 bg-yellow-100 text-yellow-800 rounded">Hint: {hint}</div>}
       </div>
+      <button onClick={() => setShowSQLRef(!showSQLRef)} className="mb-4 px-3 py-1 bg-blue-200 text-blue-900 rounded hover:bg-blue-300">
+        {showSQLRef ? 'Hide SQL Reference' : 'Show SQL Reference'}
+      </button>
+      {showSQLRef && <SQLReferencePanel />}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <QueryEditor 
           query={query}

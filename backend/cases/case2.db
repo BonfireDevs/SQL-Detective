@@ -58,3 +58,9 @@ INSERT INTO clues (clue_index, text, expected_query, expected_result) VALUES
     (0, 'Which employees have access level 3 (vault access)?', 'SELECT * FROM employees WHERE access_level = 3', NULL),
     (1, 'Find all transactions that happened at 2:37 AM.', 'SELECT * FROM transactions WHERE timestamp LIKE "%02:37%"', NULL),
     (2, 'Who is the manager that could have accessed the vault?', 'SELECT * FROM employees WHERE position = "Manager" AND access_level = 3', NULL);
+
+ALTER TABLE clues ADD COLUMN hint TEXT;
+
+UPDATE clues SET hint = 'Look for employees with the highest access level.' WHERE clue_index = 0;
+UPDATE clues SET hint = 'Check the timestamp format and look for transactions at 2:37 AM.' WHERE clue_index = 1;
+UPDATE clues SET hint = 'Managers with vault access are rare. Combine position and access level.' WHERE clue_index = 2;

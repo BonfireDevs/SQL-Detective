@@ -4,6 +4,10 @@ const BADGES = [
   { key: 'join', name: 'JOIN Master', icon: '🔗' },
   { key: 'crime', name: 'Crime Solver', icon: '🕵️' },
   { key: 'select', name: 'SELECT Pro', icon: '🎯' },
+  { key: 'hint', name: 'Hint Used', icon: '💡' },
+  { key: 'speed', name: 'Speed Runner', icon: '⏱️' },
+  { key: 'perfect', name: 'Perfect Case', icon: '🏆' },
+  { key: 'first', name: 'First Blood', icon: '🥇' },
 ];
 
 const BadgesPanel = ({ progress }) => {

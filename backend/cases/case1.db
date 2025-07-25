@@ -44,3 +44,23 @@ INSERT INTO security_logs VALUES
     (2, '2023-05-15 20:30:00', 'Egyptian Exhibit', 'Motion detected', NULL),
     (3, '2023-05-15 21:00:00', 'Main Hall', 'Door opened', 4),
     (4, '2023-05-15 21:15:00', 'Storage Room', 'Door opened', 2);
+
+-- Clues table for clue progression
+CREATE TABLE IF NOT EXISTS clues (
+    clue_index INTEGER PRIMARY KEY,
+    text TEXT,
+    expected_query TEXT,
+    expected_result TEXT,
+    hint TEXT
+);
+
+INSERT OR IGNORE INTO clues (clue_index, text, expected_query, expected_result, hint) VALUES
+    (0, 'Check the security logs for the Egyptian Exhibit on the night of the theft.', 'SELECT * FROM security_logs WHERE location = "Egyptian Exhibit"', NULL, 'Check the security logs for the Egyptian Exhibit on the night of the theft.'),
+    (1, 'Look for employees who were present in the museum at the time of the theft.', 'SELECT * FROM suspects WHERE name IN (SELECT employee_id FROM security_logs WHERE location = "Egyptian Exhibit")', NULL, 'Look for employees who were present in the museum at the time of the theft.'),
+    (2, 'Try joining the suspects and security logs tables to find connections.', 'SELECT s.name, l.timestamp FROM suspects s JOIN security_logs l ON s.id = l.employee_id', NULL, 'Try joining the suspects and security logs tables to find connections.');
+
+ALTER TABLE clues ADD COLUMN hint TEXT;
+
+UPDATE clues SET hint = 'Check the security logs for the Egyptian Exhibit on the night of the theft.' WHERE clue_index = 0;
+UPDATE clues SET hint = 'Look for employees who were present in the museum at the time of the theft.' WHERE clue_index = 1;
+UPDATE clues SET hint = 'Try joining the suspects and security logs tables to find connections.' WHERE clue_index = 2;
